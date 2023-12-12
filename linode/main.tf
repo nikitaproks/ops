@@ -11,7 +11,7 @@ provider "linode" {
     token = var.linode_token
 }
 
-module "resume-app" {
+module "resume_app" {
     source = "./modules/resume"
     root_pass =  var.root_pass
     github_token = var.github_token
