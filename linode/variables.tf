@@ -8,6 +8,21 @@ variable "root_pass" {
   type        = string
 }
 
+variable "ssh_public_key" {
+  description = "Public SSH key for authentication"
+  type        = string
+}
+
+variable "ssh_private_key_path" {
+  description = "Path to the private SSH key"
+  type        = string
+}
+
+variable "email" {
+  description = "Developer email"
+  type        = string
+}
+
 variable "shadow_pass" {
   description = "Password for the Shadowsocks proxy"
   type        = string

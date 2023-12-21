@@ -2,7 +2,7 @@ terraform {
     required_providers {
         linode = {
             source  = "linode/linode"
-            version = "1.16.0"
+            version = "2.10.0"
         }
     }
 }
@@ -26,6 +26,9 @@ module "resume_app" {
     django_superuser_username = var.django_superuser_username
     django_superuser_email = var.django_superuser_email
     django_superuser_password = var.django_superuser_password
+    ssh_public_key = var.ssh_public_key
+    ssh_private_key_path =  var.ssh_private_key_path
+    email = var.email
 }
 
 module "proxies" {
