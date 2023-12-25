@@ -13,6 +13,16 @@ variable "ssh_private_key_path" {
   type        = string
 }
 
+variable "recaptcha_secret_key" {
+  description = "Secret key for google recaptcha"
+  type        = string
+}
+
+variable "recaptcha_site_key" {
+  description = "Site key for google recaptcha"
+  type        = string
+}
+
 variable "email" {
   description = "Developer email"
   type        = string
@@ -56,11 +66,6 @@ variable "db_host" {
 
 variable "django_secret_key" {
   description = "Django secret key"
-  type        = string
-}
-
-variable "allowed_hosts" {
-  description = "Django allowed hosts"
   type        = string
 }
 

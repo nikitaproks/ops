@@ -107,13 +107,14 @@ resource "linode_instance" "resume_app" {
 
     stackscript_id = linode_stackscript.docker_stackscript.id
     stackscript_data = {
-        "TAG" = "v2023.12.21.4"
+        "TAG" = "v2023.12.25.4"
         "DOMAIN" = "mykytaprokaiev.com"
         "VOLUME_PATH" = "/dev/disk/by-id/scsi-0Linode_Volume_resume-volume"
         "EMAIL" = var.email
         "DB_PORT" = 5432
         "FRONTEND_PORT" = 3000
         "DEBUG" = false
+        "DJANGO_CORS_ORIGINS" = "https://mykytaprokaiev.com,https://www.mykytaprokaiev.com"
         "GITHUB_TOKEN" = var.github_token
         "DOCKERHUB_USERNAME" = var.dockerhub_username
         "DOCKERHUB_TOKEN" = var.dockerhub_token
@@ -122,10 +123,12 @@ resource "linode_instance" "resume_app" {
         "DB_PASS" = var.db_pass
         "DB_HOST" = var.db_host
         "DJANGO_SECRET_KEY" = var.django_secret_key
-        "ALLOWED_HOSTS" = var.allowed_hosts
+        "ALLOWED_HOSTS" = "mykytaprokaiev.com,www.mykytaprokaiev.com"
         "DJANGO_SUPERUSER_USERNAME" = var.django_superuser_username
         "DJANGO_SUPERUSER_EMAIL" = var.django_superuser_email
         "DJANGO_SUPERUSER_PASSWORD" = var.django_superuser_password
+        "RECAPTCHA_SECRET_KEY" = var.recaptcha_secret_key
+        "RECAPTCHA_SITE_KEY" = var.recaptcha_site_key
     }
 
 }

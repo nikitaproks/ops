@@ -6,7 +6,6 @@
 # <UDF name="DOCKERHUB_TOKEN" Label="Docker hub password"  />
 # <UDF name="TAG" Label="Image version tag"  />
 
-
 # <UDF name="DB_NAME" Label="Database name"  />
 # <UDF name="DB_USER" Label="Database user"  />
 # <UDF name="DB_PASS" Label="Database password"  />
@@ -20,6 +19,7 @@
 # <UDF name="DJANGO_SUPERUSER_USERNAME" Label="Django superuser username"  />
 # <UDF name="DJANGO_SUPERUSER_EMAIL" Label="Django superuser email"  />
 # <UDF name="DJANGO_SUPERUSER_PASSWORD" Label="Django superuser password"  />
+# <UDF name="DJANGO_CORS_ORIGINS" Label="Django cors origins"  />
 
 # <UDF name="FRONTEND_PORT" Label="Port to serve fronend on"  />
 
@@ -27,6 +27,9 @@
 # <UDF name="EMAIL" Label="Email for certificate creation"  />
 
 # <UDF name="VOLUME_PATH" Label="Mounted volume path"  />
+
+# <UDF name="RECAPTCHA_SECRET_KEY" Label="Recaptcha secret key"  />
+# <UDF name="RECAPTCHA_SITE_KEY" Label="Recaptcha site key"  />
 
 
 # Exit with non zero when fail
@@ -44,8 +47,13 @@ echo "export DB_HOST=$DB_HOST" >> ~/.bashrc
 echo "export DB_PORT=$DB_PORT" >> ~/.bashrc
 echo "export DEBUG=$DEBUG" >> ~/.bashrc
 echo "export DJANGO_SECRET_KEY=\"$DJANGO_SECRET_KEY\"" >> ~/.bashrc
+echo "export DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME" >> ~/.bashrc
+echo "export DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL" >> ~/.bashrc
+echo "export DJANGO_CORS_ORIGINS=\"$DJANGO_CORS_ORIGINS\"" >> ~/.bashrc
 echo "export ALLOWED_HOSTS=$ALLOWED_HOSTS" >> ~/.bashrc
 echo "export FRONTEND_PORT=$FRONTEND_PORT" >> ~/.bashrc
+echo "export RECAPTCHA_SECRET_KEY=\"$RECAPTCHA_SECRET_KEY\"" >> ~/.bashrc
+echo "export RECAPTCHA_SITE_KEY=\"$RECAPTCHA_SITE_KEY\"" >> ~/.bashrc
 
 # Format volume if needed
 FS=$(blkid -o value -s TYPE "$VOLUME_PATH" || true)
@@ -72,8 +80,10 @@ echo "$VOLUME_PATH $MOUNT_DIR ext4 defaults,nofail 0 2" >> /etc/fstab
 mkdir -p /mnt/resume-volume/letsencrypt
 sudo ln -s /mnt/resume-volume/letsencrypt /etc/letsencrypt
 
-# Create data for postgresql
+# Create repos for postgresql, static and media files
 mkdir -p /mnt/resume-volume/postgresql/data
+mkdir -p /mnt/resume-volume/static
+mkdir -p /mnt/resume-volume/media
 
 # Update and install Docker
 apt-get update
@@ -91,7 +101,10 @@ systemctl start docker
 echo "$DOCKERHUB_TOKEN" | docker login --username $DOCKERHUB_USERNAME --password-stdin
 
 # Download docker-compose.yml from GitHub
-curl -H "Authorization: token $GITHUB_TOKEN" -L https://raw.githubusercontent.com/nikitaproks/resume/main/docker-compose.yml -o /root/docker-compose.yml
+PROTOCOL="https"
+URL="://raw.githubusercontent.com/nikitaproks/resume/main/docker-compose.yml"
+FULL_URL="$PROTOCOL$URL"
+curl -H "Authorization: token $GITHUB_TOKEN" -o /root/docker-compose.yml  -SL $FULL_URL
 
 # Install certbot
 sudo apt-get install -y certbot
