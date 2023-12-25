@@ -107,7 +107,7 @@ resource "linode_instance" "resume_app" {
 
     stackscript_id = linode_stackscript.docker_stackscript.id
     stackscript_data = {
-        "TAG" = "v2023.12.25.6"
+        "TAG" = "v2023.12.25.8"
         "DOMAIN" = "mykytaprokaiev.com"
         "VOLUME_PATH" = "/dev/disk/by-id/scsi-0Linode_Volume_resume-volume"
         "EMAIL" = var.email
