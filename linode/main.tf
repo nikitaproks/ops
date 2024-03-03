@@ -15,6 +15,8 @@ module "resume_app" {
     source = "./modules/resume"
     root_pass =  var.root_pass
     github_token = var.github_token
+    telegram_token = var.telegram_token
+    backend_api_key = var.backend_api_key
     dockerhub_username = var.dockerhub_username
     dockerhub_token = var.dockerhub_token
     recaptcha_secret_key = var.recaptcha_secret_key

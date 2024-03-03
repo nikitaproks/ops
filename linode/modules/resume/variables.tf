@@ -3,6 +3,16 @@ variable "root_pass" {
   type        = string
 }
 
+variable "telegram_token" {
+  description = "Token for the Telegram bot"
+  type        = string
+}
+
+variable "backend_api_key" {
+  description = "Api key for the backend"
+  type        = string
+}
+
 variable "ssh_public_key" {
   description = "Public SSH key for authentication"
   type        = string

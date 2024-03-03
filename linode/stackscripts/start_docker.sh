@@ -6,6 +6,9 @@
 # <UDF name="DOCKERHUB_TOKEN" Label="Docker hub password"  />
 # <UDF name="TAG" Label="Image version tag"  />
 
+# <UDF name="TELEGRAM_TOKEN" Label="Telegram bot token"  />
+# <UDF name="BACKEND_API_KEY" Label="Backend api token"  />
+
 # <UDF name="DB_NAME" Label="Database name"  />
 # <UDF name="DB_USER" Label="Database user"  />
 # <UDF name="DB_PASS" Label="Database password"  />
@@ -84,6 +87,11 @@ sudo ln -s /mnt/resume-volume/letsencrypt /etc/letsencrypt
 mkdir -p /mnt/resume-volume/postgresql/data
 mkdir -p /mnt/resume-volume/static
 mkdir -p /mnt/resume-volume/media
+
+# Setup rate limiting
+iptables -A INPUT -p tcp --dport 443 -m limit --limit 100/min -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -m limit --limit 100/min -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -m limit --limit 10/min -j ACCEPT
 
 # Update and install Docker
 apt-get update

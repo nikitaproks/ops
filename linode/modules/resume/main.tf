@@ -107,15 +107,17 @@ resource "linode_instance" "resume_app" {
 
     stackscript_id = linode_stackscript.docker_stackscript.id
     stackscript_data = {
-        "TAG" = "v2023.12.25.8"
+        "TAG" = "v2024.3.3.0"
         "DOMAIN" = "mykytaprokaiev.com"
         "VOLUME_PATH" = "/dev/disk/by-id/scsi-0Linode_Volume_resume-volume"
         "EMAIL" = var.email
         "DB_PORT" = 5432
         "FRONTEND_PORT" = 3000
-        "DEBUG" = false
+        "DEBUG" = "True"
         "DJANGO_CORS_ORIGINS" = "https://mykytaprokaiev.com,https://www.mykytaprokaiev.com"
         "GITHUB_TOKEN" = var.github_token
+        "TELEGRAM_TOKEN" = var.telegram_token
+        "BACKEND_API_KEY" = var.backend_api_key
         "DOCKERHUB_USERNAME" = var.dockerhub_username
         "DOCKERHUB_TOKEN" = var.dockerhub_token
         "DB_NAME" = var.db_name
