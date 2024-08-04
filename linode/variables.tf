@@ -3,6 +3,11 @@ variable "linode_token" {
   type        = string
 }
 
+variable "linode_api_key" {
+  description = "Your Linode API Token"
+  type        = string
+}
+
 variable "root_pass" {
   description = "Root password for the Linode instance"
   type        = string
@@ -10,6 +15,11 @@ variable "root_pass" {
 
 variable "telegram_token" {
   description = "Token for the Telegram bot"
+  type        = string
+}
+
+variable "vpn_bot_telegram_token" {
+  description = "Token for the Vpn Telegram bot"
   type        = string
 }
 

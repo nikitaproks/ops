@@ -16,11 +16,11 @@ resource "linode_stackscript" "shadowsocks" {
   
 }
 
-# resource "linode_instance" "dallas_proxy" {
-#     label="dallas-proxy"
+# resource "linode_instance" "spain_proxy" {
+#     label="spain-proxy"
 #     image="linode/ubuntu20.04"
 #     type="g6-nanode-1"
-#     region="us-central"
+#     region="es-mad"
 #     root_pass = var.root_pass
 
 #     stackscript_id = linode_stackscript.shadowsocks.id
@@ -28,8 +28,8 @@ resource "linode_stackscript" "shadowsocks" {
 #         "SERVER_PORT" = "8388"
 #         "PASSWORD" = var.shadow_pass
 #         "LOCAL_PORT" = "1080"
-#         "METHOD" = "aes-256-gcm"
-#         "TIMEOUT" = "300"
+#         "METHOD" = "chacha20-ietf-poly1305"
+#         "TIMEOUT" = "600"
 #     }
 # }
 
