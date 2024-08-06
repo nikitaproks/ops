@@ -31,7 +31,7 @@ resource "linode_instance" "vpn_bot" {
 
   stackscript_id = linode_stackscript.vpn_bot_stackscript.id
   stackscript_data = {
-    "TAG"                  = "v_0.1.1"
+    "TAG"                  = "v_0.1.4"
     "ALLOWED_CHAT_IDS"     = "451426008,285520565"
     "STACKSCRIPT_ID"       = 1280586
     "GITHUB_TOKEN"         = var.github_token
