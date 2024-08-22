@@ -52,3 +52,7 @@ module "vpn_bot" {
   linode_api_key       = var.linode_api_key
   shadow_pass          = var.shadow_pass
 }
+
+module "cloud_storage" {
+  source = "./modules/cloud_storage"
+}
