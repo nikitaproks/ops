@@ -18,27 +18,27 @@ resource "linode_stackscript" "vpn_bot_stackscript" {
 }
 
 
-resource "linode_instance" "vpn_bot" {
-  label     = "vpn-bot"
-  image     = "linode/ubuntu20.04"
-  region    = "eu-central"
-  type      = "g6-nanode-1"
-  root_pass = var.root_pass
+# resource "linode_instance" "vpn_bot" {
+#   label     = "vpn-bot"
+#   image     = "linode/ubuntu20.04"
+#   region    = "eu-central"
+#   type      = "g6-nanode-1"
+#   root_pass = var.root_pass
 
-  authorized_keys = [
-    var.ssh_public_key
-  ]
+#   authorized_keys = [
+#     var.ssh_public_key
+#   ]
 
-  stackscript_id = linode_stackscript.vpn_bot_stackscript.id
-  stackscript_data = {
-    "TAG"                  = "v_0.1.4"
-    "ALLOWED_CHAT_IDS"     = "451426008,285520565"
-    "STACKSCRIPT_ID"       = 1280586
-    "GITHUB_TOKEN"         = var.github_token
-    "BOT_API_KEY"          = var.telegram_token
-    "DOCKERHUB_USERNAME"   = var.dockerhub_username
-    "DOCKERHUB_TOKEN"      = var.dockerhub_token
-    "API_KEY_LINODE"       = var.linode_api_key
-    "SHADOWSOCKS_PASSWORD" = var.shadow_pass
-  }
-}
+#   stackscript_id = linode_stackscript.vpn_bot_stackscript.id
+#   stackscript_data = {
+#     "TAG"                  = "v_0.1.4"
+#     "ALLOWED_CHAT_IDS"     = "451426008,285520565"
+#     "STACKSCRIPT_ID"       = 1280586
+#     "GITHUB_TOKEN"         = var.github_token
+#     "BOT_API_KEY"          = var.telegram_token
+#     "DOCKERHUB_USERNAME"   = var.dockerhub_username
+#     "DOCKERHUB_TOKEN"      = var.dockerhub_token
+#     "API_KEY_LINODE"       = var.linode_api_key
+#     "SHADOWSOCKS_PASSWORD" = var.shadow_pass
+#   }
+# }

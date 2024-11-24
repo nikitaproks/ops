@@ -11,6 +11,11 @@ provider "linode" {
   token = var.linode_token
 }
 
+module "domains" {
+  source = "./modules/domains"
+  email  = var.email
+}
+
 module "resume_app" {
   source                    = "./modules/resume"
   root_pass                 = var.root_pass
@@ -53,6 +58,11 @@ module "vpn_bot" {
   shadow_pass          = var.shadow_pass
 }
 
-module "cloud_storage" {
-  source = "./modules/cloud_storage"
+module "password_manager" {
+  source                       = "./modules/password_manager"
+  mykytaprokaiev_com_domain_id = module.domains.mykytaprokaiev_com_domain_id
+  mykytaprokaiev_com_domain    = module.domains.mykytaprokaiev_com_domain
+  ssh_private_key_path         = var.ssh_private_key_path
+  root_pass                    = var.root_pass
+  ssh_public_key               = var.ssh_public_key
 }
