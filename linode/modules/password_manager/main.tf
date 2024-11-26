@@ -2,103 +2,26 @@ terraform {
   required_providers {
     linode = {
       source  = "linode/linode"
-      version = "2.10.0"
+      version = "2.31.1"
     }
   }
 }
 
+# TODO: move this to a stackscript module
+resource "linode_stackscript" "mounted_volume_docker_stackscript" {
+  label       = "mounted-volume-docker-stackscript"
+  description = "Mounts volume and installs docker"
+  script      = file("./stackscripts/mounted_volume_docker.sh")
+  images      = ["linode/ubuntu20.04", "linode/ubuntu22.04"]
+  rev_note    = "initial version"
+}
 
-# resource "linode_stackscript" "docker_stackscript" {
-#     label = "docker-stackscript"
-#     description = "Installs and starts docker containers"
-#     script = file("./stackscripts/start_docker.sh")
-#     images = ["linode/ubuntu20.04", "linode/ubuntu22.04"]
-#     rev_note = "initial version"
-
-# }
-
-# resource "linode_firewall" "resume_firewall" {
-#   label = "resume_firewall"
-
-#   inbound {
-#     label    = "allow-ssh"
-#     action   = "ACCEPT"
-#     protocol = "TCP"
-#     ports    = "22"
-#     ipv4     = ["0.0.0.0/0"]
-#     ipv6     = ["::/0"]
-#   }
-
-#   inbound {
-#     label    = "allow-http"
-#     action   = "ACCEPT"
-#     protocol = "TCP"
-#     ports    = "80"
-#     ipv4     = ["0.0.0.0/0"]
-#     ipv6     = ["::/0"]
-#   }
-
-#   inbound {
-#     label    = "allow-https"
-#     action   = "ACCEPT"
-#     protocol = "TCP"
-#     ports    = "443"
-#     ipv4     = ["0.0.0.0/0"]
-#     ipv6     = ["::/0"]
-#   }
-
-#   inbound_policy = "DROP"
-
-#   outbound {
-#     label    = "allow-specific-http"
-#     action   = "ACCEPT"
-#     protocol = "TCP"
-#     ports    = "80"
-#     ipv4     = [
-#         "91.189.91.81/32", # ubuntu.com
-#         "23.53.41.91/32", # linode.com
-#         "140.82.112.4/32", # github.com
-#         "185.199.108.133/32", # githubusercontent.com
-#         "185.199.109.133/32", # githubusercontent.com
-#         "185.199.110.133/32", # githubusercontent.com
-#         "185.199.11.133/32",# githubusercontent.com
-#         "44.219.3.189/32", # docker.com
-#         "44.193.181.103/32", # docker.com
-#         "3.224.227.198/32" # docker.com
-#     ]
-#   }
-
-#   outbound {
-#     label    = "allow-specific-https"
-#     action   = "ACCEPT"
-#     protocol = "TCP"
-#     ports    = "443"
-#     ipv4     = [
-#         "91.189.91.81/32", # ubuntu.com
-#         "23.53.41.91/32", # linode.com
-#         "140.82.112.4/32", # github.com
-#         "185.199.108.133/32", # githubusercontent.com
-#         "185.199.109.133/32", # githubusercontent.com
-#         "185.199.110.133/32", # githubusercontent.com
-#         "185.199.11.133/32",# githubusercontent.com
-#         "44.219.3.189/32", # docker.com
-#         "44.193.181.103/32", # docker.com
-#         "3.224.227.198/32" # docker.com
-#     ]
-#   }
-
-#   outbound_policy = "ACCEPT"
-
-#   linodes = [linode_instance.resume_app.id]
-# }
-#
 resource "linode_volume" "password_manager_volume" {
   label     = "password-manager-volume"
   size      = 10
   region    = linode_instance.password_manager_instance.region
   linode_id = linode_instance.password_manager_instance.id
 }
-
 
 resource "linode_instance" "password_manager_instance" {
   label     = "password-manager-instance"
@@ -111,15 +34,30 @@ resource "linode_instance" "password_manager_instance" {
     var.ssh_public_key
   ]
 
-  # stackscript_id = linode_stackscript.docker_stackscript.id
-  # stackscript_data = {
-  #   "VOLUME_PATH"  = linode_volume.password_manager_volume.filesystem_path
-  #   "GITHUB_TOKEN" = var.github_token
-  # }
+  stackscript_id = linode_stackscript.mounted_volume_docker_stackscript.id
+  stackscript_data = {
+    # hardcoded due to circular dependency
+    "VOLUME_PATH" = "/dev/disk/by-id/scsi-0Linode_Volume_password-manager-volume"
+    "MOUNT_DIR"   = var.mount_dir
+  }
 }
 
-resource "null_resource" "clone_password_manager" {
+resource "linode_domain_record" "subdomain_pm" {
+  domain_id   = var.mykytaprokaiev_com_domain_id
+  name        = "pm"
+  record_type = "A"
+  target      = linode_instance.password_manager_instance.ip_address
+  ttl_sec     = 300
+}
+
+# TODO: put this into a stackscript and make it common
+resource "null_resource" "start_password_manager" {
   depends_on = [linode_instance.password_manager_instance]
+
+  triggers = {
+    instance_id = linode_instance.password_manager_instance.id
+    volume_id   = linode_volume.password_manager_volume.id
+  }
 
   connection {
     host        = linode_instance.password_manager_instance.ip_address
@@ -129,26 +67,23 @@ resource "null_resource" "clone_password_manager" {
 
   provisioner "remote-exec" {
     inline = [
-      "apt-get update && apt-get install -y git",
+      # Wait for Docker to be active
+      "echo 'Waiting for Docker to start...'",
+      "retries=30; while ! systemctl is-active --quiet docker; do sleep 3; retries=$((retries - 1)); if [ $retries -le 0 ]; then echo 'Docker did not start in time'; exit 1; fi; done",
+      "echo 'Docker is active'",
+      "if [ -d \"password_manager\" ]; then rm -rf password_manager; fi",
       "git clone https://github.com/nikitaproks/password_manager",
+      join(
+        " && ",
+        [
+          "export ADMIN_TOKEN='${var.admin_token}'",
+          "export DOMAIN=pm.mykytaprokaiev.com",
+          "export VAULT_PERSISTENT_PATH=${var.mount_dir}/vault",
+          "export CADDY_DATA_PERSISTENT_PATH=${var.mount_dir}/caddy/data",
+          "export CADDY_CONFIG_PERSISTENT_PATH=${var.mount_dir}/caddy/config",
+          "cd password_manager && docker compose up --build -d"
+        ]
+      )
     ]
   }
-}
-
-
-
-resource "linode_domain_record" "www" {
-  domain_id   = var.mykytaprokaiev_com_domain_id
-  name        = "www"
-  record_type = "A"
-  target      = linode_instance.password_manager_instance.ip_address
-  ttl_sec     = 100
-}
-
-resource "linode_domain_record" "root" {
-  domain_id   = var.mykytaprokaiev_com_domain_id
-  name        = ""
-  record_type = "A"
-  target      = linode_instance.password_manager_instance.ip_address
-  ttl_sec     = 100
 }

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     linode = {
       source  = "linode/linode"
-      version = "2.10.0"
+      version = "2.31.1"
     }
   }
 }
@@ -39,6 +39,5 @@ resource "linode_stackscript" "vpn_bot_stackscript" {
 #     "DOCKERHUB_USERNAME"   = var.dockerhub_username
 #     "DOCKERHUB_TOKEN"      = var.dockerhub_token
 #     "API_KEY_LINODE"       = var.linode_api_key
-#     "SHADOWSOCKS_PASSWORD" = var.shadow_pass
 #   }
 # }

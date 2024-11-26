@@ -2,7 +2,7 @@ terraform {
   required_providers {
     linode = {
       source  = "linode/linode"
-      version = "2.10.0"
+      version = "2.31.1"
     }
   }
 }
@@ -39,12 +39,6 @@ module "resume_app" {
   email                     = var.email
 }
 
-module "proxies" {
-  source      = "./modules/proxy"
-  root_pass   = var.root_pass
-  shadow_pass = var.shadow_pass
-}
-
 module "vpn_bot" {
   source               = "./modules/vpn_bot"
   root_pass            = var.root_pass
@@ -55,7 +49,6 @@ module "vpn_bot" {
   ssh_public_key       = var.ssh_public_key
   ssh_private_key_path = var.ssh_private_key_path
   linode_api_key       = var.linode_api_key
-  shadow_pass          = var.shadow_pass
 }
 
 module "password_manager" {
@@ -65,4 +58,6 @@ module "password_manager" {
   ssh_private_key_path         = var.ssh_private_key_path
   root_pass                    = var.root_pass
   ssh_public_key               = var.ssh_public_key
+  mount_dir                    = "/mnt/password_manager_volume"
+  admin_token                  = var.password_manager_admin_token
 }

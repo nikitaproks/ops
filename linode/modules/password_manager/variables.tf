@@ -20,3 +20,11 @@ variable "mykytaprokaiev_com_domain_id" {
 variable "mykytaprokaiev_com_domain" {
   type = string
 }
+
+variable "mount_dir" {
+  type = string
+}
+
+variable "admin_token" {
+  type = string
+}

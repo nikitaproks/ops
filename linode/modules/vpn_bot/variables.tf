@@ -34,11 +34,6 @@ variable "dockerhub_token" {
   type        = string
 }
 
-variable "shadow_pass" {
-  description = "Password for the Shadowsocks proxy"
-  type        = string
-}
-
 variable "linode_api_key" {
   description = "API key for linode"
   type        = string

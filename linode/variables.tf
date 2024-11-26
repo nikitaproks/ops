@@ -54,11 +54,6 @@ variable "email" {
   type        = string
 }
 
-variable "shadow_pass" {
-  description = "Password for the Shadowsocks proxy"
-  type        = string
-}
-
 variable "github_token" {
   description = "Token for accessing github"
   type        = string
@@ -112,4 +107,12 @@ variable "django_superuser_email" {
 variable "django_superuser_password" {
   description = "Django superuser password"
   type        = string
+}
+
+variable "password_manager_admin_token" {
+  type = string
+}
+
+variable "password_manager_admin_token_unhashed" {
+  type = string
 }

@@ -1,20 +1,20 @@
 terraform {
-    required_providers {
-        linode = {
-            source  = "linode/linode"
-            version = "2.10.0"
-        }
+  required_providers {
+    linode = {
+      source  = "linode/linode"
+      version = "2.31.1"
     }
+  }
 }
 
 
 resource "linode_stackscript" "docker_stackscript" {
-    label = "docker-stackscript"
-    description = "Installs and starts docker containers"
-    script = file("./stackscripts/start_docker.sh")
-    images = ["linode/ubuntu20.04", "linode/ubuntu22.04"]
-    rev_note = "initial version"
-  
+  label       = "docker-stackscript"
+  description = "Installs and starts docker containers"
+  script      = file("./stackscripts/start_docker.sh")
+  images      = ["linode/ubuntu20.04", "linode/ubuntu22.04"]
+  rev_note    = "initial version"
+
 }
 
 # resource "linode_firewall" "resume_firewall" {
@@ -103,7 +103,7 @@ resource "linode_stackscript" "docker_stackscript" {
 #     authorized_keys = [
 #       var.ssh_public_key
 #     ]
-    
+
 
 #     stackscript_id = linode_stackscript.docker_stackscript.id
 #     stackscript_data = {
