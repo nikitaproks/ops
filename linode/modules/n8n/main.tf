@@ -7,15 +7,15 @@ terraform {
   }
 }
 
-resource "linode_volume" "password_manager_volume" {
-  label     = "password-manager-volume"
+resource "linode_volume" "n8n_volume" {
+  label     = "n8n-volume"
   size      = 10
-  region    = linode_instance.password_manager_instance.region
-  linode_id = linode_instance.password_manager_instance.id
+  region    = linode_instance.n8n_instance.region
+  linode_id = linode_instance.n8n_instance.id
 }
 
-resource "linode_instance" "password_manager_instance" {
-  label     = "password-manager-instance"
+resource "linode_instance" "n8n_instance" {
+  label     = "n8n-instance"
   image     = "linode/ubuntu20.04"
   region    = "eu-central"
   type      = "g6-nanode-1"
@@ -26,40 +26,17 @@ resource "linode_instance" "password_manager_instance" {
   ]
 }
 
-resource "linode_domain_record" "subdomain_pm" {
+resource "linode_domain_record" "subdomain_n8n" {
   domain_id   = var.mykytaprokaiev_com_domain_id
-  name        = "pm"
+  name        = "n8n"
   record_type = "A"
-  target      = linode_instance.password_manager_instance.ip_address
+  target      = linode_instance.n8n_instance.ip_address
   ttl_sec     = 300
 }
 
-resource "linode_domain_record" "spf" {
-  domain_id   = var.mykytaprokaiev_com_domain_id
-  name        = ""
-  record_type = "TXT"
-  target      = "v=spf1 include:_spf.mailersend.net ~all"
-}
-
-resource "linode_domain_record" "dkim" {
-  domain_id   = var.mykytaprokaiev_com_domain_id
-  name        = "mlsend2._domainkey"
-  record_type = "CNAME"
-  target      = "mlsend2._domainkey.mailersend.net"
-}
-
-
-resource "linode_domain_record" "return_path" {
-  domain_id   = var.mykytaprokaiev_com_domain_id
-  name        = "mta"
-  record_type = "CNAME"
-  ttl_sec     = 3600
-  target      = "mailersend.net"
-}
-
 # Security
-resource "linode_firewall" "pm_firewall" {
-  label = "pm-firewall"
+resource "linode_firewall" "n8n_firewall" {
+  label = "n8n-firewall"
 
   inbound {
     label    = "allow-http"
@@ -91,21 +68,21 @@ resource "linode_firewall" "pm_firewall" {
   inbound_policy  = "DROP"
   outbound_policy = "ACCEPT"
 
-  linodes = [linode_instance.password_manager_instance.id]
+  linodes = [linode_instance.n8n_instance.id]
 }
 
 
 
 # Provisioning
-resource "null_resource" "provision_password_manager" {
-  depends_on = [linode_instance.password_manager_instance]
+resource "null_resource" "provision_n8n" {
+  depends_on = [linode_instance.n8n_instance]
 
   triggers = {
-    instance_id = linode_instance.password_manager_instance.id
+    instance_id = linode_instance.n8n_instance.id
   }
 
   connection {
-    host        = linode_instance.password_manager_instance.ip_address
+    host        = linode_instance.n8n_instance.ip_address
     user        = "root"
     private_key = file(var.ssh_private_key_path)
   }
@@ -121,9 +98,15 @@ resource "null_resource" "provision_password_manager" {
     destination = "/tmp/install_docker.sh"
   }
 
+
   provisioner "file" {
-    source      = "scripts/start_pm.sh"
-    destination = "/tmp/start_pm.sh"
+    source      = "scripts/start_n8n.sh"
+    destination = "/tmp/start_n8n.sh"
+  }
+
+  provisioner "file" {
+    source      = "certificates/self-hosted-database-ca-certificate.crt"
+    destination = "/tmp/self-hosted-database-ca-certificate.crt"
   }
 
   # Make scripts executable
@@ -131,16 +114,17 @@ resource "null_resource" "provision_password_manager" {
     inline = [
       "chmod +x /tmp/mount_volume.sh",
       "chmod +x /tmp/install_docker.sh",
-      "chmod +x /tmp/start_pm.sh"
+      "chmod +x /tmp/start_n8n.sh"
     ]
   }
 
   # Run the mount_volume script
   provisioner "remote-exec" {
     inline = [
-      "bash /tmp/mount_volume.sh /dev/disk/by-id/scsi-0Linode_Volume_password-manager-volume ${var.mount_dir}"
+      "bash /tmp/mount_volume.sh /dev/disk/by-id/scsi-0Linode_Volume_n8n-volume ${var.mount_dir}"
     ]
   }
+
 
   # Run the install_docker script
   provisioner "remote-exec" {
@@ -149,10 +133,10 @@ resource "null_resource" "provision_password_manager" {
     ]
   }
 
-  # Run the start_pm script with parameters
+  # Run the start_n8n script with parameters
   provisioner "remote-exec" {
     inline = [
-      "bash /tmp/start_pm.sh '${var.admin_token}' pm.mykytaprokaiev.com ${var.mount_dir}"
+      "bash /tmp/start_n8n.sh ${var.postgres_host} ${var.postgres_port} ${var.postgres_user} ${var.postgres_password} n8n.mykytaprokaiev.com ${var.mount_dir}"
     ]
   }
 }

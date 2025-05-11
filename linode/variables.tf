@@ -116,3 +116,8 @@ variable "password_manager_admin_token" {
 variable "password_manager_admin_token_unhashed" {
   type = string
 }
+
+variable "postgres_n8n_password" {
+  description = "Database password"
+  type        = string
+}

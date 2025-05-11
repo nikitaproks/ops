@@ -2,20 +2,11 @@ terraform {
   required_providers {
     linode = {
       source  = "linode/linode"
-      version = "2.31.1"
+      version = "2.37.0"
     }
   }
 }
 
-
-resource "linode_stackscript" "docker_stackscript" {
-  label       = "docker-stackscript"
-  description = "Installs and starts docker containers"
-  script      = file("./stackscripts/start_docker.sh")
-  images      = ["linode/ubuntu20.04", "linode/ubuntu22.04"]
-  rev_note    = "initial version"
-
-}
 
 # resource "linode_firewall" "resume_firewall" {
 #   label = "resume_firewall"
@@ -103,35 +94,6 @@ resource "linode_stackscript" "docker_stackscript" {
 #     authorized_keys = [
 #       var.ssh_public_key
 #     ]
-
-
-#     stackscript_id = linode_stackscript.docker_stackscript.id
-#     stackscript_data = {
-#         "TAG" = "v2024.03.23"
-#         "DOMAIN" = "mykytaprokaiev.com"
-#         "VOLUME_PATH" = "/dev/disk/by-id/scsi-0Linode_Volume_resume-volume"
-#         "EMAIL" = var.email
-#         "DB_PORT" = 5432
-#         "FRONTEND_PORT" = 3000
-#         "DEBUG" = "True"
-#         "DJANGO_CORS_ORIGINS" = "https://mykytaprokaiev.com,https://www.mykytaprokaiev.com"
-#         "GITHUB_TOKEN" = var.github_token
-#         "TELEGRAM_TOKEN" = var.telegram_token
-#         "BACKEND_API_KEY" = var.backend_api_key
-#         "DOCKERHUB_USERNAME" = var.dockerhub_username
-#         "DOCKERHUB_TOKEN" = var.dockerhub_token
-#         "DB_NAME" = var.db_name
-#         "DB_USER" = var.db_user
-#         "DB_PASS" = var.db_pass
-#         "DB_HOST" = var.db_host
-#         "DJANGO_SECRET_KEY" = var.django_secret_key
-#         "ALLOWED_HOSTS" = "mykytaprokaiev.com,www.mykytaprokaiev.com"
-#         "DJANGO_SUPERUSER_USERNAME" = var.django_superuser_username
-#         "DJANGO_SUPERUSER_EMAIL" = var.django_superuser_email
-#         "DJANGO_SUPERUSER_PASSWORD" = var.django_superuser_password
-#         "RECAPTCHA_SECRET_KEY" = var.recaptcha_secret_key
-#         "RECAPTCHA_SITE_KEY" = var.recaptcha_site_key
-#     }
 
 # }
 

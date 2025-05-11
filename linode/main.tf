@@ -2,7 +2,7 @@ terraform {
   required_providers {
     linode = {
       source  = "linode/linode"
-      version = "2.31.1"
+      version = "2.37.0"
     }
   }
 }
@@ -14,6 +14,26 @@ provider "linode" {
 module "domains" {
   source = "./modules/domains"
   email  = var.email
+}
+
+module "general" {
+  source          = "./modules/general"
+  n8n_public_ipv4 = module.n8n.n8n_public_ipv4
+}
+
+module "n8n" {
+  source                       = "./modules/n8n"
+  mykytaprokaiev_com_domain_id = module.domains.mykytaprokaiev_com_domain_id
+  ssh_private_key_path         = var.ssh_private_key_path
+  root_pass                    = var.root_pass
+  ssh_public_key               = var.ssh_public_key
+  mount_dir                    = "/mnt/n8n_volume"
+  postgres_host                = module.general.postgres_host
+  postgres_port                = module.general.postgres_port
+  postgres_schema              = "public"
+  postgres_database            = "n8n"
+  postgres_user                = "n8n_user"
+  postgres_password            = var.postgres_n8n_password
 }
 
 module "resume_app" {
